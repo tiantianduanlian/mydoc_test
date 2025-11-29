@@ -2,9 +2,9 @@
 name: Build and Deploy to gh-pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches:
+      - main
 
   # Allows manual trigger
   workflow_dispatch:
