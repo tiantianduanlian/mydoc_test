@@ -1,31 +1,42 @@
-name: Deploy to GitHub Pages
+# Workflow for building and deploying to gh-pages branch
+name: Build and Deploy to gh-pages
 
 on:
+  # Runs on pushes targeting the default branch
   push:
-    branches:
-      - main
+    branches: ["main"]
 
+  # Allows manual trigger
+  workflow_dispatch:
+
+# Sets permissions
 permissions:
-  contents: write  # 添加这个权限
+  contents: write  # 需要写入权限来推送分支
 
 jobs:
-  deploy:
-    name: Deploy to GitHub Pages
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          node-version: 24
-          cache: npm
+          fetch-depth: 0  # 获取完整历史以便正确部署
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'  # 缓存依赖加速构建
 
       - name: Install dependencies
         run: npm ci
-      - name: Build website
-        run: npm run build
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Build project
+        run: npm run build  # 假设你的构建命令是这个
+
+      - name: Deploy to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          folder: build  # 构建产物目录，根据你的项目调整（可能是 dist）
+          branch: gh-pages  # 目标分支
+          clean: true  # 清理目标分支上的旧文件
